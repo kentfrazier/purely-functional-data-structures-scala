@@ -34,6 +34,33 @@ object DenseBinaryNumber {
           One :: decrement(rest) // borrow
 
       }
+
+
+
+      override val zero: Nat = Nil
+
+      override def toInt(n: Nat): Int = {
+        n.zipWithIndex
+          .collect {
+            case (One, rank) =>
+              1 << rank
+          }
+          .sum
+      }
+
+      override def fromInt(i: Int): Nat = {
+        val oneBits = BinaryNumber.oneBitRanks(i).toSet
+        (0 to oneBits.max)
+          .map { rank =>
+            if (oneBits(rank)) {
+              One
+            } else {
+              Zero
+            }
+          }
+          .toList
+      }
+
     }
   }
 }

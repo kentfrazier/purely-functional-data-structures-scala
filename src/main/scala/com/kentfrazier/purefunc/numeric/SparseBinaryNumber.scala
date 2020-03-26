@@ -43,6 +43,16 @@ object SparseBinaryNumber {
 
       override def decrement(n: Nat): Nat = borrow(1, n)
 
+      override val zero: Nat = Nil
+
+      override def toInt(n: Nat): Int = n.sum
+
+      override def fromInt(i: Int): Nat = {
+        BinaryNumber.oneBitRanks(i)
+          .map(1 << _)
+          .sorted
+      }
+
     }
   }
 }
