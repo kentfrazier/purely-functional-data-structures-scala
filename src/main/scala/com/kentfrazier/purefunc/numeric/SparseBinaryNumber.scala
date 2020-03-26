@@ -20,20 +20,20 @@ object SparseBinaryNumber {
       def carry(weight: Int, n: Nat): Nat = n match {
         case Nil =>
           weight :: Nil
-        case current @ head :: rest =>
+        case current @ head :: tail =>
           if (weight < head) {
             weight :: current
           } else {
-            carry(weight * 2, rest)
+            carry(weight * 2, tail)
           }
       }
 
       def borrow(weight: Int, n: Nat): Nat = n match {
         case Nil =>
           throw BinaryNumber.IllegalSubtractionError
-        case current @ head :: rest =>
+        case current @ head :: tail =>
           if (weight == head) {
-            rest
+            tail
           } else {
             weight :: borrow(weight * 2, current)
           }
@@ -43,11 +43,27 @@ object SparseBinaryNumber {
 
       override def decrement(n: Nat): Nat = borrow(1, n)
 
+      override def add(n1: Nat, n2: Nat): Nat = (n1, n2) match {
+        case (Nil, other) =>
+          other
+        case (other, Nil) =>
+          other
+        case (head1 :: tail1, head2 :: tail2) =>
+          if (head1 < head2) {
+            head1 :: head2 :: add(tail1, tail2)
+          } else if (head1 > head2) {
+            head2 :: head1 :: add(tail1, tail2)
+          } else {
+            carry(head1 + head2, add(tail1, tail2))
+          }
+      }
+
       override val zero: Nat = Nil
 
       override def toInt(n: Nat): Int = n.sum
 
       override def fromInt(i: Int): Nat = {
+        require(i >= 0, "Only non-negative integers can be represented")
         BinaryNumber.oneBitRanks(i)
           .map(1 << _)
           .sorted

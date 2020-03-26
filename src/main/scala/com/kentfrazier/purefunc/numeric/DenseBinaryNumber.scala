@@ -6,7 +6,7 @@ package com.kentfrazier.purefunc.numeric
  * See Chapter 9.2
  */
 object DenseBinaryNumber {
-  sealed trait Digit
+  sealed abstract class Digit
   case object Zero extends Digit
   case object One extends Digit
 
@@ -32,10 +32,23 @@ object DenseBinaryNumber {
           Zero :: rest
         case Zero :: rest =>
           One :: decrement(rest) // borrow
-
       }
 
-
+      override def add(n1: Nat, n2: Nat): Nat = (n1, n2) match {
+        case (Nil, other) =>
+          other
+        case (other, Nil) =>
+          other
+        case (head1 :: rest1, head2 :: rest2) =>
+          (head1, head2) match {
+            case (Zero, Zero) =>
+              Zero :: add(rest1, rest2)
+            case (One, Zero) | (Zero, One) =>
+              One :: add(rest1, rest2)
+            case (One, One) =>
+              Zero :: increment(add(rest1, rest2))
+          }
+      }
 
       override val zero: Nat = Nil
 
@@ -49,6 +62,7 @@ object DenseBinaryNumber {
       }
 
       override def fromInt(i: Int): Nat = {
+        require(i >= 0, "Only non-negative integers can be represented")
         val oneBits = BinaryNumber.oneBitRanks(i).toSet
         (0 to oneBits.max)
           .map { rank =>
