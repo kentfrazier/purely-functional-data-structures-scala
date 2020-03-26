@@ -16,6 +16,6 @@ trait BinaryNumber[N] {
 }
 object BinaryNumber {
 
-  case object IllegalDecrementError extends IllegalStateException
+  case object IllegalSubtractionError extends IllegalStateException
 
 }

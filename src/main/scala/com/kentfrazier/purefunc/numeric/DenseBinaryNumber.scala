@@ -1,7 +1,5 @@
 package com.kentfrazier.purefunc.numeric
 
-import scala.util.{Failure, Success, Try}
-
 /**
  * Dense representation of binary numbers, with digits in increasing order of significance
  *
@@ -13,7 +11,6 @@ object DenseBinaryNumber {
   case object One extends Digit
 
   type Nat = List[Digit]
-
   object Nat {
     implicit case object DenseBinaryNumberBN extends BinaryNumber[Nat] {
 
@@ -28,7 +25,7 @@ object DenseBinaryNumber {
 
       override def decrement(n: Nat): Nat = n match {
         case Nil =>
-          throw BinaryNumber.IllegalDecrementError
+          throw BinaryNumber.IllegalSubtractionError
         case One :: Nil =>
           Nil
         case One :: rest =>
