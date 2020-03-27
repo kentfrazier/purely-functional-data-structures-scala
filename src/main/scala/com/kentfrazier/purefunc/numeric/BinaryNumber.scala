@@ -13,6 +13,18 @@ trait BinaryNumber[N] {
 
   def add(n1: N, n2: N): N
 
+  def eq(n1: N, n2: N): Boolean = toInt(n1) == toInt(n2)
+
+  def ne(n1: N, n2: N): Boolean = !eq(n1, n2)
+
+  def gt(n1: N, n2: N): Boolean = !le(n1, n2)
+
+  def ge(n1: N, n2: N): Boolean = toInt(n1) >= toInt(n2)
+
+  def lt(n1: N, n2: N): Boolean = !ge(n1, n2)
+
+  def le(n1: N, n2: N): Boolean = toInt(n1) <= toInt(n2)
+
   val zero: N
 
   lazy val one: N = increment(zero)

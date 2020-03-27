@@ -48,11 +48,11 @@ object SparseBinaryNumber {
           other
         case (other, Nil) =>
           other
-        case (head1 :: tail1, head2 :: tail2) =>
+        case (a @ head1 :: tail1, b @ head2 :: tail2) =>
           if (head1 < head2) {
-            head1 :: head2 :: add(tail1, tail2)
+            head1 :: add(tail1, b)
           } else if (head1 > head2) {
-            head2 :: head1 :: add(tail1, tail2)
+            head2 :: add(a, tail2)
           } else {
             carry(head1 + head2, add(tail1, tail2))
           }
