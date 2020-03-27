@@ -1,5 +1,14 @@
 package com.kentfrazier.purefunc.numeric
 
+/**
+ * Segmented binary numbers, with digits in increasing order of significance
+ *
+ * The advantage of this representation is that increment and decrement can be performed in O(1)
+ * time, since contiguous blocks of ones or zeros are handled all at once and the invariant guarantees
+ * that these blocks must alternate.
+ *
+ * See Chapter 9.2.4
+ */
 object SegmentedBinaryNumber {
 
   sealed abstract class DigitBlock

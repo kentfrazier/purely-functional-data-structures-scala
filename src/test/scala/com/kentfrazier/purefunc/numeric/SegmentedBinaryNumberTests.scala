@@ -3,7 +3,7 @@ package com.kentfrazier.purefunc.numeric
 import org.scalacheck.Gen
 
 class SegmentedBinaryNumberTests
-  extends BinaryNumberTests[SegmentedBinaryNumber.Nat]("SegmentedBinaryNumber")(SegmentedBinaryNumber.Nat.SegmentedBinaryNumberBN) {
+  extends BinaryNumberTests[SegmentedBinaryNumber.Nat]("SegmentedBinaryNumber")(SegmentedBinaryNumber.Nat.SegmentedBinaryNumberBN, implicitly) {
 
   import SegmentedBinaryNumber._
 

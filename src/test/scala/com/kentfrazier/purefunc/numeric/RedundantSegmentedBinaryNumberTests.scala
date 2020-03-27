@@ -1,0 +1,4 @@
+package com.kentfrazier.purefunc.numeric
+
+class RedundantSegmentedBinaryNumberTests
+  extends BinaryNumberTests[RedundantSegmentedBinaryNumber.Nat]("RedundantSegmentedBinaryNumber")(RedundantSegmentedBinaryNumber.Nat.RedundantSegmentedBinaryNumberBN, implicitly)

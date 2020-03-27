@@ -6,18 +6,21 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import scala.reflect.ClassTag
+
 abstract class BinaryNumberTests[N](
   val name: String
 )(
   implicit
-  val bn: BinaryNumber[N]
+  val bn: BinaryNumber[N],
+  val classTag: ClassTag[N]
 ) extends AnyWordSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit def shrink[A]: Shrink[A] = Shrink.shrinkAny // disable shrinking
 
   implicit object BinaryNumberEquals extends Equality[N] {
     override def areEqual(a: N, b: Any): Boolean = b match {
-      case n: N =>
+      case classTag(n) =>
         bn.eq(a, n)
       case _ =>
         false
@@ -47,7 +50,6 @@ abstract class BinaryNumberTests[N](
     "always be symmetrical" in {
       forAll(Gen.choose(0, Int.MaxValue)) { i =>
         val fromInt = bn.fromInt(i)
-        println(i, fromInt)
         val toInt = bn.toInt(fromInt)
         toInt shouldEqual i
       }
