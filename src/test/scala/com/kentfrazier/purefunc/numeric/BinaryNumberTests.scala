@@ -47,6 +47,7 @@ abstract class BinaryNumberTests[N](
     "always be symmetrical" in {
       forAll(Gen.choose(0, Int.MaxValue)) { i =>
         val fromInt = bn.fromInt(i)
+        println(i, fromInt)
         val toInt = bn.toInt(fromInt)
         toInt shouldEqual i
       }

@@ -65,7 +65,7 @@ object SegmentedBinaryNumber {
           add(n2, n1) // handle mixed case below by flipping order here so we don't have to repeat it all twice
         case (Zeros(zeroCount) :: tail1, Ones(oneCount) :: tail2) =>
           if (zeroCount > oneCount) {
-            prependOnes(oneCount, prependZeros(zeroCount - oneCount, add(tail2, tail1)))
+            prependOnes(oneCount, add(Zeros(zeroCount - oneCount) :: tail1, tail2))
           } else if (zeroCount < oneCount) {
             prependOnes(zeroCount, add(tail1, Ones(oneCount - zeroCount) :: tail2))
           } else { // counts equal
@@ -81,15 +81,27 @@ object SegmentedBinaryNumber {
           }
         case (Ones(count1) :: tail1, Ones(count2) :: tail2) =>
           if (count1 > count2) {
-            prependZeros(count2, increment(add(tail2, Ones(count1 - count2) :: tail1)))
+            prependZeros(1, prependOnes(count2 - 1, increment(add(tail2, Ones(count1 - count2) :: tail1))))
           } else if (count1 < count2) {
-            prependZeros(count1, increment(add(tail1, Ones(count2 - count1) :: tail2)))
+            prependZeros(1, prependOnes(count1 - 1, increment(add(tail1, Ones(count2 - count1) :: tail2))))
           } else { // counts equal
-            prependZeros(count2, increment(add(tail1, tail2)))
+            prependZeros(1, prependOnes(count2 - 1, increment(add(tail1, tail2))))
           }
       }
 
       override val zero: Nat = Nil
+
+      override def fromInt(i: Int): Nat = {
+        val oneBits = BinaryNumber.oneBitRanks(i)
+        val (firstOneRank, n) = oneBits
+          .foldRight[(Option[Int], Nat)]((None, Nil)) {
+            case (nextOneRank, (None, blocks)) =>
+              (Some(nextOneRank), prependOnes(1, blocks))
+            case (nextOneRank, (Some(currentRank), blocks)) =>
+              (Some(nextOneRank), prependOnes(1, prependZeros(currentRank - nextOneRank - 1, blocks)))
+          }
+        prependZeros(firstOneRank.getOrElse(0), n)
+      }
 
       override def toInt(n: Nat): Int = {
         val (finalSum, _) = n.foldLeft((0, 0)) {
