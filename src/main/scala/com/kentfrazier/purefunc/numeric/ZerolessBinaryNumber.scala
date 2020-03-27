@@ -63,6 +63,8 @@ object ZerolessBinaryNumber {
           .sum
       }
 
+      override def invariantViolations(n: Nat): List[String] = Nil // no violations allowed within type system
+
     }
   }
 

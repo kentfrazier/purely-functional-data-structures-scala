@@ -55,6 +55,8 @@ trait BinaryNumber[N] {
 
   def toInt(n: N): Int
 
+  def invariantViolations(n: N): List[String]
+
 }
 object BinaryNumber {
 

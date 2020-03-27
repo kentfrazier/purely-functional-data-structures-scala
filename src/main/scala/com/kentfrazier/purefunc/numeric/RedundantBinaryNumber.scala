@@ -73,6 +73,10 @@ object RedundantBinaryNumber {
           .sum
       }
 
+      override def invariantViolations(n: Nat): List[String] = n.lastOption.toList.filter(_ == Zero).map { _ =>
+        "most significant bit must not be zero"
+      }
+
     }
   }
 

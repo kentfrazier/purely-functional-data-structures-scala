@@ -69,6 +69,21 @@ object SparseBinaryNumber {
           .sorted
       }
 
+      override def invariantViolations(n: Nat): List[String] = {
+        val monotonicallyIncreasing = n.zipWithIndex.sliding(2).toList.collect {
+          case (weight1, offset) :: (weight2, _) :: _ if weight1 >= weight2 =>
+            s"monotonically increasing order is required, but $weight1 comes before $weight2 at offset $offset"
+        }
+        val onlyPowersOfTwo = n.zipWithIndex.collect {
+          case (weight, offset) if BinaryNumber.oneBitRanks(weight).size != 1 =>
+            s"weight $weight at offset $offset is not a power of two"
+        }
+        val onlyPositiveWeights = n.zipWithIndex.collect {
+          case (weight, offset) if weight <= 0 =>
+            s"weight $weight at offset $offset is non-positive"
+        }
+        monotonicallyIncreasing ++ onlyPowersOfTwo ++ onlyPositiveWeights
+      }
     }
   }
 }

@@ -35,6 +35,14 @@ abstract class BinaryNumberTests[N](
     a3 <- Gen.choose(0, Int.MaxValue - a1 - a2)
   } yield (bn.fromInt(a1), bn.fromInt(a2), bn.fromInt(a3))
 
+  "fromInt" should {
+    "always maintain invariants" in {
+      forAll(Gen.choose(0, Int.MaxValue)) { n =>
+        bn.invariantViolations(bn.fromInt(n)) should have size 0
+      }
+    }
+  }
+
   "fromInt and toInt" should {
     "always be symmetrical" in {
       forAll(Gen.choose(0, Int.MaxValue)) { i =>
@@ -55,11 +63,19 @@ abstract class BinaryNumberTests[N](
   }
 
   "increment" should {
+
+    "always maintain invariants" in {
+      forAll(Gen.choose(0, Int.MaxValue - 1).map(bn.fromInt)) { n =>
+        bn.invariantViolations(bn.increment(n)) should have size 0
+      }
+    }
+
     "return a value equal to n + 1" in {
       forAll(Gen.choose(0, Int.MaxValue - 1)) { n =>
         bn.increment(bn.fromInt(n)) shouldEqual bn.fromInt(n + 1)
       }
     }
+
   }
 
   "increment" when {
@@ -82,11 +98,19 @@ abstract class BinaryNumberTests[N](
   }
 
   "decrement" should {
+
+    "always maintain invariants" in {
+      forAll(Gen.choose(1, Int.MaxValue).map(bn.fromInt)) { n =>
+        bn.invariantViolations(bn.decrement(n)) should have size 0
+      }
+    }
+
     "return a value equal to n - 1" in {
       forAll(Gen.choose(0, Int.MaxValue - 1)) { n =>
         bn.decrement(bn.fromInt(n + 1)) shouldEqual bn.fromInt(n)
       }
     }
+
   }
 
   "decrement" when {
@@ -108,6 +132,13 @@ abstract class BinaryNumberTests[N](
   }
 
   "add" should {
+
+    "always maintain invariants" in {
+      forAll(addendsGen) {
+        case (a, b, _) =>
+        bn.invariantViolations(bn.add(a, b)) should have size 0
+      }
+    }
 
     "have the property of additive identity with zero, whether on the left or right" in {
       forAll(numGen) { n =>
