@@ -41,10 +41,10 @@ object RedundantSegmentedBinaryNumberV2 {
           digits
         } else {
           digits match {
-            case Ones(oneCount) :: tail =>
-              Ones(count + oneCount) :: tail
+            case Twos(twoCount) :: tail =>
+              Twos(count + twoCount) :: tail
             case tail =>
-              Ones(count) :: tail
+              Twos(count) :: tail
           }
         }
       }
@@ -86,6 +86,8 @@ object RedundantSegmentedBinaryNumberV2 {
           prependTwos(1, prependThrees(count - 1, tail))
         case Twos(count) :: tail =>
           prependOnes(1, prependTwos(count - 1, tail))
+        case Ones(1) :: Nil =>
+          Nil
         case Ones(count) :: tail =>
           Zero :: prependOnes(count - 1, tail)
         case Zero :: _ =>
@@ -227,13 +229,17 @@ object RedundantSegmentedBinaryNumberV2 {
       }
 
       override def invariantViolations(n: Nat): List[String] = {
-        val endsWithOnesOrTwo = n.lastOption.toList.collect {
+        val doesNotEndWithZero = n.lastOption.toList.collect {
           case Zero =>
             "most significant digit must not be Zero"
         }
         val countsStrictlyPositive = n.zipWithIndex.collect {
           case (ones @ Ones(count), offset) if count <= 0 =>
             s"invalid non-positive Ones count for element $ones at offset $offset"
+          case (ones @ Twos(count), offset) if count <= 0 =>
+            s"invalid non-positive Twos count for element $ones at offset $offset"
+          case (ones @ Threes(count), offset) if count <= 0 =>
+            s"invalid non-positive Threes count for element $ones at offset $offset"
         }
         val (greenYellowRedOrdering, _) = n
           .map(n => n -> n.color)
@@ -252,7 +258,7 @@ object RedundantSegmentedBinaryNumberV2 {
           case (o1 @ Ones(_), offset) :: (o2 @ Ones(_), _) :: _ =>
             s"illegal contiguous Ones blocks $o1 and $o2 starting at offset $offset"
         }
-        endsWithOnesOrTwo ++ countsStrictlyPositive ++ greenYellowRedOrdering ++ noContiguousOneBlocks
+        doesNotEndWithZero ++ countsStrictlyPositive ++ greenYellowRedOrdering ++ noContiguousOneBlocks
       }
 
     }
