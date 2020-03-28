@@ -35,18 +35,15 @@ object SkewBinaryNumber {
           predecessor :: predecessor :: tail
       }
 
-      @tailrec
-      private[this] def restoreInvariants(digits: List[Int]): Nat = digits match {
-        case lowTwo1 :: lowTwo2 :: highTwo1 :: highTwo2 :: tail if lowTwo1 == lowTwo2 && highTwo1 == highTwo2 =>
-          restoreInvariants(decrement(lowTwo1 :: lowTwo2 :: Nil) ++ increment(highTwo1 :: highTwo2 :: tail))
-        case one :: two1 :: two2 :: tail if two1 == two2 =>
-          if (one > two1) {
-            restoreInvariants(two1 :: two2 :: one :: tail)
-          } else {
-            restoreInvariants(decrement(one :: Nil) ++ increment(two1 :: two2 :: tail))
-          }
-        case valid =>
-          valid
+      private[this] def concat(front: Nat, back: Nat): Nat = (front, back) match {
+        case (Nil, finished) =>
+          finished
+        case (_front @ headF :: _, headB :: tailB) if headF > headB =>
+          concat(headB :: Nil, concat(_front, tailB))
+        case (_front, _back @ two1 :: two2 :: _) if two1 == two2 =>
+          concat(decrement(_front), increment(_back))
+        case (_validFront, _validBack) =>
+          _validFront ++ _validBack
       }
 
       override def add(n1: Nat, n2: Nat): Nat = (n1, n2) match {
@@ -55,14 +52,27 @@ object SkewBinaryNumber {
         case (other, Nil) =>
           other
         case (a, b) =>
-          a.reverse.zipAll(b.reverse, -1, -1).foldLeft(zero) {
-            case (prevN, (-1, d)) =>
-              restoreInvariants(d :: prevN)
-            case (prevN, (d, -1)) =>
-              restoreInvariants(d :: prevN)
-            case (prevN, (d1, d2)) =>
-              restoreInvariants(math.min(d1, d2) :: restoreInvariants(math.max(d1, d2) :: prevN))
-          }
+          Iterator
+            .iterate((a.reverse, b.reverse, zero)) {
+              case (Nil, Nil, n) =>
+                (Nil, Nil, n)
+              case (digit :: tail, Nil, n) =>
+                (tail, Nil, concat(digit :: Nil, n))
+              case (Nil, digit :: tail, n) =>
+                (tail, Nil, concat(digit :: Nil, n))
+              case (digits1 @ head1 :: tail1, digits2 @ head2 :: tail2, n) =>
+                if (head1 > head2) {
+                  (tail1, digits2, concat(head1 :: Nil, n))
+                } else {
+                  (digits1, tail2, concat(head2 :: Nil, n))
+                }
+            }
+            .dropWhile {
+              case (digits1, digits2, _) =>
+                digits1.nonEmpty || digits2.nonEmpty
+            }
+            .next()
+            ._3
       }
 
       override val zero: Nat = Nil

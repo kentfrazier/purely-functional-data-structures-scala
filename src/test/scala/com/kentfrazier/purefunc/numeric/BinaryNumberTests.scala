@@ -139,7 +139,12 @@ abstract class BinaryNumberTests[N](
     "always maintain invariants" in {
       forAll(addendsGen) {
         case (a, b, _) =>
-        bn.invariantViolations(bn.add(a, b)) should have size 0
+          val sum = bn.add(a, b)
+//          println(s"a       : $a")
+//          println(s"b       : $b")
+//          println(s"sum     : $sum")
+//          println(s"expected: ${bn.fromInt(bn.toInt(a) + bn.toInt(b))}")
+          bn.invariantViolations(sum) should have size 0
       }
     }
 
