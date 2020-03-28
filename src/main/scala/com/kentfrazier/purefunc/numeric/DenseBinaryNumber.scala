@@ -64,7 +64,7 @@ object DenseBinaryNumber {
       override def fromInt(i: Int): Nat = {
         require(i >= 0, "Only non-negative integers can be represented")
         val oneBits = BinaryNumber.oneBitRanks(i).toSet
-        (0 to oneBits.max)
+        (0 to oneBits.maxOption.getOrElse(0))
           .map { rank =>
             if (oneBits(rank)) {
               One

@@ -16,7 +16,6 @@ class SegmentedBinaryNumberTests
     (32, List(Zeros(5), Ones(1))),
     (123875, List(Ones(2), Zeros(3), Ones(5), Zeros(3), Ones(4))),
     (89297634, List(Zeros(1), Ones(1), Zeros(3), Ones(3), Zeros(1), Ones(1), Zeros(2), Ones(1), Zeros(2), Ones(1), Zeros(1), Ones(1), Zeros(2), Ones(1), Zeros(1), Ones(1), Zeros(1), Ones(1), Zeros(1), Ones(1))),
-    (2019006550, List(Zeros(1), Ones(2), Zeros(1), Ones(1), Zeros(1), Ones(1), Zeros(4), Ones(2), Zeros(2), Ones(4), Zeros(1), Ones(1), Zeros(1), Ones(1), Zeros(4), Ones(4))),
   )
 
   "toInt" should {

@@ -27,20 +27,25 @@ abstract class BinaryNumberTests[N](
     }
   }
 
-  val numGen: Gen[N] = Gen.choose(0, Int.MaxValue).map(bn.fromInt)
+  /**
+   * Symbolic constant to make it easier to constrain the range of possible integers while debugging
+   */
+  val MaxIntValue: Int = Int.MaxValue
+
+  val numGen: Gen[N] = Gen.choose(0, MaxIntValue).map(bn.fromInt)
 
   /**
    * safe generator to prevent integer overflow when adding for up to three addends
    */
   val addendsGen: Gen[(N, N, N)] = for {
-    a1 <- Gen.choose(0, Int.MaxValue)
-    a2 <- Gen.choose(0, Int.MaxValue - a1)
-    a3 <- Gen.choose(0, Int.MaxValue - a1 - a2)
+    a1 <- Gen.choose(0, MaxIntValue)
+    a2 <- Gen.choose(0, MaxIntValue - a1)
+    a3 <- Gen.choose(0, MaxIntValue - a1 - a2)
   } yield (bn.fromInt(a1), bn.fromInt(a2), bn.fromInt(a3))
 
   "fromInt" should {
     "always maintain invariants" in {
-      forAll(Gen.choose(0, Int.MaxValue)) { n =>
+      forAll(Gen.choose(0, MaxIntValue)) { n =>
         bn.invariantViolations(bn.fromInt(n)) should have size 0
       }
     }
@@ -48,7 +53,7 @@ abstract class BinaryNumberTests[N](
 
   "fromInt and toInt" should {
     "always be symmetrical" in {
-      forAll(Gen.choose(0, Int.MaxValue)) { i =>
+      forAll(Gen.choose(0, MaxIntValue)) { i =>
         val fromInt = bn.fromInt(i)
         val toInt = bn.toInt(fromInt)
         toInt shouldEqual i
@@ -58,7 +63,7 @@ abstract class BinaryNumberTests[N](
 
   "increment and decrement" should {
     "always be symmetrical" in {
-      forAll(Gen.choose(1, Int.MaxValue - 1).map(bn.fromInt)) { n =>
+      forAll(Gen.choose(1, MaxIntValue - 1).map(bn.fromInt)) { n =>
         bn.decrement(bn.increment(n)) shouldEqual n
         bn.increment(bn.decrement(n)) shouldEqual n
       }
@@ -68,13 +73,13 @@ abstract class BinaryNumberTests[N](
   "increment" should {
 
     "always maintain invariants" in {
-      forAll(Gen.choose(0, Int.MaxValue - 1).map(bn.fromInt)) { n =>
+      forAll(Gen.choose(0, MaxIntValue - 1).map(bn.fromInt)) { n =>
         bn.invariantViolations(bn.increment(n)) should have size 0
       }
     }
 
     "return a value equal to n + 1" in {
-      forAll(Gen.choose(0, Int.MaxValue - 1)) { n =>
+      forAll(Gen.choose(0, MaxIntValue - 1)) { n =>
         bn.increment(bn.fromInt(n)) shouldEqual bn.fromInt(n + 1)
       }
     }
@@ -103,13 +108,13 @@ abstract class BinaryNumberTests[N](
   "decrement" should {
 
     "always maintain invariants" in {
-      forAll(Gen.choose(1, Int.MaxValue).map(bn.fromInt)) { n =>
+      forAll(Gen.choose(1, MaxIntValue).map(bn.fromInt)) { n =>
         bn.invariantViolations(bn.decrement(n)) should have size 0
       }
     }
 
     "return a value equal to n - 1" in {
-      forAll(Gen.choose(0, Int.MaxValue - 1)) { n =>
+      forAll(Gen.choose(0, MaxIntValue - 1)) { n =>
         bn.decrement(bn.fromInt(n + 1)) shouldEqual bn.fromInt(n)
       }
     }
