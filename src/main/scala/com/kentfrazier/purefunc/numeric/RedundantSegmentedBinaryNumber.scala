@@ -103,6 +103,10 @@ object RedundantSegmentedBinaryNumber {
           add(restoreInvariants(invalid), other)
         case (invalid @ Two :: _, other) =>
           add(restoreInvariants(invalid), other)
+        case (other, invalid @ Ones(_) :: Two :: _) =>
+          add(other, restoreInvariants(invalid))
+        case (invalid @ Ones(_) :: Two :: _, other) =>
+          add(other, restoreInvariants(invalid))
         case (Ones(_) :: _, Zero :: _) =>
           add(n2, n1) // handle mixed cases below by flipping order here so we don't have to repeat it all twice
         case (Zero :: tail1, Ones(oneCount) :: tail2) =>
