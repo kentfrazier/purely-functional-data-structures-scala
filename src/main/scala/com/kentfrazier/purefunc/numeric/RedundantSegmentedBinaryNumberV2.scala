@@ -100,16 +100,11 @@ object RedundantSegmentedBinaryNumberV2 {
       private[this] def restoreInvariants(digits: List[Digits]): Nat = digits match {
         case Zero :: tail =>
           prependTwos(1, simpleDecrement(tail))
-        case Ones(count) :: Zero :: tail =>
-          Ones(count) :: prependTwos(1, simpleDecrement(tail))
-        case Threes(count) :: Zero :: tail =>
-          Threes(count) :: prependTwos(1, simpleDecrement(tail))
         case Four :: tail =>
           prependTwos(1, simpleIncrement(tail))
-        case Ones(count) :: Four :: tail =>
-          Ones(count) :: prependTwos(1, simpleIncrement(tail))
-        case Threes(count) :: Four :: tail =>
-          Threes(count) :: prependTwos(1, simpleIncrement(tail))
+        case head :: tail if head.color == Yellow =>
+          // recurse as long as the leading elements are Yellow, since no Green element to cancel out any Red ones
+          head :: restoreInvariants(tail)
         case other =>
           other
       }
@@ -243,22 +238,27 @@ object RedundantSegmentedBinaryNumberV2 {
         }
         val (greenYellowRedOrdering, _) = n
           .map(n => n -> n.color)
+          .iterator
           .zipWithIndex.foldLeft[(List[String], Boolean)](Nil, false) {
-          case ((violations, _), ((_, Green), _)) =>
-            (violations, true)
-          case ((violations, greenEncountered), ((_, Yellow), _)) =>
-            (violations, greenEncountered)
-          case ((violations, true), ((_, Red), _)) =>
-            (violations, false)
-          case ((violations, false), ((element, Red), index)) =>
-            val violation = s"invalid Red element $element encountered at index $index without previous Green element"
-            (violation :: violations, false)
+            case ((violations, _), ((_, Green), _)) =>
+              (violations, true)
+            case ((violations, greenEncountered), ((_, Yellow), _)) =>
+              (violations, greenEncountered)
+            case ((violations, true), ((_, Red), _)) =>
+              (violations, false)
+            case ((violations, false), ((element, Red), index)) =>
+              val violation = s"invalid Red element $element encountered at index $index without previous Green element"
+              (violation :: violations, false)
+          }
+        val noContiguousBlocksOfSameNumber = n.zipWithIndex.sliding(2).toList.collect {
+          case (a @ Ones(_), offset) :: (b @ Ones(_), _) :: _ =>
+            s"illegal contiguous Ones blocks $a and $b starting at offset $offset"
+          case (a @ Twos(_), offset) :: (b @ Twos(_), _) :: _ =>
+            s"illegal contiguous Twos blocks $a and $b starting at offset $offset"
+          case (a @ Threes(_), offset) :: (b @ Threes(_), _) :: _ =>
+            s"illegal contiguous Threes blocks $a and $b starting at offset $offset"
         }
-        val noContiguousOneBlocks = n.zipWithIndex.sliding(2).toList.collect {
-          case (o1 @ Ones(_), offset) :: (o2 @ Ones(_), _) :: _ =>
-            s"illegal contiguous Ones blocks $o1 and $o2 starting at offset $offset"
-        }
-        doesNotEndWithZero ++ countsStrictlyPositive ++ greenYellowRedOrdering ++ noContiguousOneBlocks
+        doesNotEndWithZero ++ countsStrictlyPositive ++ greenYellowRedOrdering ++ noContiguousBlocksOfSameNumber
       }
 
     }
